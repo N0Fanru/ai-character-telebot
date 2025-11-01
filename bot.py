@@ -9,9 +9,9 @@ import difflib
 from dotenv import load_dotenv
 
 try:
-    from promts import *
+    from prompts import *
 except ImportError:
-    from promts_exaple import *
+    from prompts_exaple import *
     print("WARNING: This will use a promt template. Create your own promts.py file.")
 
 load_dotenv()
