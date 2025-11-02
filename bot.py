@@ -195,4 +195,7 @@ def echo_message(message):
                 print("Message sends.")
                 bot.reply_to(message, answer)
 
+    elif not NO_WHITELIST_M.strip() == "" and message.chat.type == 'private':
+        bot.reply_to(message, NO_WHITELIST_M)
+
 bot.infinity_polling(none_stop=True)

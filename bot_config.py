@@ -20,6 +20,7 @@ MODEL_IM="mistralai/mistral-small-3.2-24b-instruct:free"
 # Whitelist config 
 WHITELIST_PRIVATE=True # Is whitelisting enabled for private messages
 WHITELIST=[ADMIN_ID, 123456789] # User IDs in the whitelist
+NO_WHITELIST_M="Sorry, but you can't use this bot in private messages because you are not on the whitelist." # The message sent to the user if they are not on the whitelist. Leave blank if you do not want this message to be sent.
 WHITELIST_CHAT=True # Is whitelisting enabled for chat
 WHITE_CHATS=[-1234567890123, -3210987654321] # Chat IDs in the whitelist
 
