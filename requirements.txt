@@ -1,3 +1,2 @@
 telebot
 requests
-python-dotenv

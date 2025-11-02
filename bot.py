@@ -6,34 +6,21 @@ import base64
 import os
 import random
 import difflib
-from dotenv import load_dotenv
 
 try:
     from prompts import *
 except ImportError:
-    from prompts_exaple import *
-    print("WARNING: This will use a promt template. Create your own promts.py file.")
+    from bot_prompts import *
+    print("WARNING: This will use a promt template. Create your own prompts.py file.")
 
-load_dotenv()
+try:
+    from config import *
+except ImportError:
+    from bot_config import *
+
 
 TG_CHANNEL_ID = 777000 # constant
-API_KEY = os.getenv("API_KEY")
-TOKEN_BOT = os.getenv("TOKEN")
-adm = int(os.getenv("ADMIN_ID")) # user ID to whom error messages are sent
-
-white_list_private = os.getenv("WHITE_LIST_PRIVATE", "false").lower() in ("true", "1", "yes", "on")
-white_list = [adm] + json.loads(os.getenv("WHITE_LIST")) # User IDs, in private messages with whom the bot works 
-white_list_chat = os.getenv("WHITE_LIST_CHAT", "false").lower() in ("true", "1", "yes", "on")
-white_chats = json.loads(os.getenv("CHATS")) # Chat IDs where the bot is active
-
-chance_comments = float(os.getenv("CHANCE_COMMENTS"))
-chance_replay = float(os.getenv("CHANCE_REPLY"))
-chance_chat = float(os.getenv("CHANCE_CHAT"))
-
-model = os.getenv("MODEL") # AI model for text generation
-model_im = os.getenv("MODEL_IM") # AI model for image recognition
-MAX_TRY = int(os.getenv("MAX_TRY")) # Maximum number of attempts to send an AI request
-special_ids = json.loads(os.getenv("SPECIAL_IDS"))
+adm = ADMIN_ID
 
 bot = telebot.TeleBot(TOKEN_BOT)
 
@@ -51,7 +38,7 @@ def analyze_image(image_data):
             "Authorization": f"Bearer {API_KEY}"
         },
         data=json.dumps({
-            "model": model_im,
+            "model": MODEL_IM,
             "messages": [
             {
                 "role": "user",
@@ -104,7 +91,7 @@ def get_answer(context, text):
             "Authorization": f"Bearer {API_KEY}"
         },
         data=json.dumps({
-            "model": model,
+            "model": MODEL,
             "messages": [
             {   "role": "system",
                 "content": prompt
@@ -154,16 +141,16 @@ def remove_duplicate_text(text, similarity_threshold=0.9):
 # checks if the bot can respond
 def can_answer(message):
     if message.chat.type == 'private': # in private messages
-        if not white_list_private or message.from_user.id in white_list:
+        if not WHITELIST_PRIVATE or message.from_user.id in WHITELIST:
             return True
         else:
             return False
-    elif not white_list_chat or message.chat.id in white_chats: # in chats
-        if random.random() < chance_comments and message.from_user.id == TG_CHANNEL_ID: # comment
+    elif not WHITELIST_CHAT or message.chat.id in WHITE_CHATS: # in chats
+        if random.random() < CHANCE_COMMENTS and message.from_user.id == TG_CHANNEL_ID: # comment
             return True
-        elif random.random() < chance_replay and message.reply_to_message and message.reply_to_message.from_user.id == bot.get_me().id: # The bot responded to the message
+        elif random.random() < CHANCE_REPLY and message.reply_to_message and message.reply_to_message.from_user.id == bot.get_me().id: # The bot responded to the message
             return True
-        elif random.random() < chance_chat:
+        elif random.random() < CHANCE_CHAT:
             return True
         else:
             return False
@@ -196,7 +183,7 @@ def echo_message(message):
                 extra_prompt = prompt_comment
             elif message.chat.type == 'private':
                 extra_prompt = prompt_private
-            elif message.from_user.id in special_ids:
+            elif message.from_user.id in SPECIAL_IDS:
                 extra_prompt = prompt_special
             else:
                 extra_prompt = prompt_chat

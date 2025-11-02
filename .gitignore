@@ -1,5 +1,4 @@
 __pycache__/
-.env
-*.env
 prompts.py
 test.txt
+config.py
