@@ -30,7 +30,7 @@ A Telegram bot with AI integration (via OpenRouter) for generating text response
    <br>In command line: `pip install -r requirements.txt`
 
 4. Configuration setup
-   <br>Rename .env.example file to .env and modify its content according to your needs following the comments in the file.
+   <br>Modify the contents of the bot_config.py file to suit your needs following the comments in the file.
    <br>*Note: You can find user or group IDs using various Telegram bots (e.g., Get Any ID)*
 
 5. Create prompts
