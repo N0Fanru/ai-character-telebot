@@ -17,6 +17,12 @@ MODEL="tngtech/deepseek-r1t-chimera:free"
 # AI model for image recognition
 MODEL_IM="mistralai/mistral-small-3.2-24b-instruct:free"
 
+# The second model for image recognition, which will be used for the second and subsequent attempts
+MODEL_IM2="google/gemini-2.0-flash-exp:free"
+
+# Allow the admin (ADMIN_ID) to describe the image themselves if the AI ​​was unable to do so
+ADMIN_DESCRIP_IM=False
+
 # Whitelist config 
 WHITELIST_PRIVATE=True # Is whitelisting enabled for private messages
 WHITELIST=[ADMIN_ID, 123456789] # User IDs in the whitelist

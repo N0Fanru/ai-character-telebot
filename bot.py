@@ -32,13 +32,17 @@ def analyze_image(image_data):
     image_data_url = f"data:image/jpeg;base64,{base64_image}"
 
     for n in range(MAX_TRY):
+        if n == 0:
+            model = MODEL_IM
+        else:
+            model = MODEL_IM2
         response = requests.post(
         url="https://openrouter.ai/api/v1/chat/completions",
         headers={
             "Authorization": f"Bearer {API_KEY}"
         },
         data=json.dumps({
-            "model": MODEL_IM,
+            "model": model,
             "messages": [
             {
                 "role": "user",
@@ -67,9 +71,6 @@ def analyze_image(image_data):
                 print("Empty answer, try again...")
             else:
                 return response.json()["choices"][0]["message"]["content"]
-        elif response.status_code == 429:
-            bot.send_message(adm, f"Error while analyzing the photo: {response.status_code}")
-            return None
         else:
             print(f"Error: {response.status_code}, try again...")
     
@@ -173,29 +174,41 @@ def echo_message(message):
             file_info = bot.get_file(message.photo[-1].file_id)
             file = bot.download_file(file_info.file_path)
             result = analyze_image(file)
+            if result is None and ADMIN_DESCRIP_IM:
+                send = bot.send_photo(adm, message.photo[-1].file_id, "Enter a description of the image:")
+                bot.register_next_step_handler(send, get_im_descript, message, text)
+                return
             if result is not None:
                 text = f"{text}\n\nAttached image: [{result}]"
         if not text or text.strip() == "":
             bot.reply_to(message, "An empty request was sent.")
         else:
-            # Additional prompt depending on context
-            if message.from_user.id == TG_CHANNEL_ID:
-                extra_prompt = prompt_comment
-            elif message.chat.type == 'private':
-                extra_prompt = prompt_private
-            elif message.from_user.id in SPECIAL_IDS:
-                extra_prompt = prompt_special
-            else:
-                extra_prompt = prompt_chat
-
-            answer = get_answer(extra_prompt, text)
-            if answer:
-                answer = re.sub(r'<think>.*?</think>', '', answer, flags=re.DOTALL)
-                answer = remove_duplicate_text(answer)
-                print("Message sends.")
-                bot.reply_to(message, answer)
-
+            send_answer(message, text)
+            
     elif not NO_WHITELIST_M.strip() == "" and message.chat.type == 'private':
         bot.reply_to(message, NO_WHITELIST_M)
+
+def get_im_descript(message, mes, text):
+    text = f"{text}\n\nAttached image: [{message.text}]"
+    send_answer(mes, text)
+
+def send_answer(message, text):
+    # Additional prompt depending on context
+    if message.from_user.id == TG_CHANNEL_ID:
+        extra_prompt = prompt_comment
+    elif message.chat.type == 'private':
+        extra_prompt = prompt_private
+    elif message.from_user.id in SPECIAL_IDS:
+        extra_prompt = prompt_special
+    else:
+        extra_prompt = prompt_chat
+
+    answer = get_answer(extra_prompt, text)
+    if answer:
+        answer = re.sub(r'<think>.*?</think>', '', answer, flags=re.DOTALL)
+        answer = remove_duplicate_text(answer)
+        print("Message sends.")
+        bot.reply_to(message, answer)
+
 
 bot.infinity_polling(none_stop=True)
