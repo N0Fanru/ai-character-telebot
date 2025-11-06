@@ -33,6 +33,9 @@ WHITE_CHATS=[-1234567890123, -3210987654321] # Chat IDs in the whitelist
 # If these lines are in the message, the bot will not respond.
 PHRASE_BLOCKLIST=[]
 
+# Will the bot analyze and respond to each photo that is in the same media group
+REPLY_ALL_PHOTO = False
+
 # Chance of response, a number from 0 to 1 (0 - will never respond, 1 - always responds)
 CHANCE_COMMENTS=1 # a chance to leave a comment under the post
 CHANCE_REPLY=0.7 # chance to reply if the user replied to the bot's message

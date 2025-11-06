@@ -22,6 +22,8 @@ except ImportError:
 TG_CHANNEL_ID = 777000 # constant
 adm = ADMIN_ID
 
+last_media_group = -1
+
 bot = telebot.TeleBot(TOKEN_BOT)
 
 # Gets an image and returns the AI ​​description of the image.
@@ -140,8 +142,8 @@ def remove_duplicate_text(text, similarity_threshold=0.9):
 
 
 # checks if the bot can respond
-def can_answer(message):
-    if PHRASE_BLOCKLIST and any(phrase in message.text for phrase in PHRASE_BLOCKLIST):
+def can_answer(message, text):
+    if PHRASE_BLOCKLIST and text is not None and any(phrase in text for phrase in PHRASE_BLOCKLIST):
         return False
 
     if message.chat.type == 'private': # in private messages
@@ -164,16 +166,23 @@ def can_answer(message):
 
 @bot.message_handler(content_types=['text', 'photo'])
 def echo_message(message):
-    if can_answer(message):
-        if message.content_type == "text":
-            text = message.text
-        elif message.caption is not None:
-            text = message.caption
-        else:
-            text = ""
-        
+    global last_media_group
+
+    if message.content_type == "text":
+        text = message.text
+    elif message.caption is not None:
+        text = message.caption
+    else:
+        text = ""
+    
+    can_answ = can_answer(message, text)
+    if can_answ:
         # If there is a photo, it is recognized and a description is added to the text.
         if message.content_type == "photo":
+            if not REPLY_ALL_PHOTO and last_media_group == message.media_group_id:
+                return
+            elif message.media_group_id is not None:
+                last_media_group = message.media_group_id
             file_info = bot.get_file(message.photo[-1].file_id)
             file = bot.download_file(file_info.file_path)
             result = analyze_image(file)
@@ -187,7 +196,8 @@ def echo_message(message):
             bot.reply_to(message, "An empty request was sent.")
         else:
             send_answer(message, text)
-            
+    elif can_answ is None:
+        return
     elif not NO_WHITELIST_M.strip() == "" and message.chat.type == 'private':
         bot.reply_to(message, NO_WHITELIST_M)
 
