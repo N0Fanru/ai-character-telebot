@@ -141,6 +141,9 @@ def remove_duplicate_text(text, similarity_threshold=0.9):
 
 # checks if the bot can respond
 def can_answer(message):
+    if PHRASE_BLOCKLIST and any(phrase in message.text for phrase in PHRASE_BLOCKLIST):
+        return False
+
     if message.chat.type == 'private': # in private messages
         if not WHITELIST_PRIVATE or message.from_user.id in WHITELIST:
             return True
@@ -151,7 +154,7 @@ def can_answer(message):
             return True
         elif random.random() < CHANCE_REPLY and message.reply_to_message and message.reply_to_message.from_user.id == bot.get_me().id: # The bot responded to the message
             return True
-        elif random.random() < CHANCE_CHAT:
+        elif random.random() < CHANCE_CHAT and message.from_user.id != TG_CHANNEL_ID:
             return True
         else:
             return False

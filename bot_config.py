@@ -30,6 +30,9 @@ NO_WHITELIST_M="Sorry, but you can't use this bot in private messages because yo
 WHITELIST_CHAT=True # Is whitelisting enabled for chat
 WHITE_CHATS=[-1234567890123, -3210987654321] # Chat IDs in the whitelist
 
+# If these lines are in the message, the bot will not respond.
+PHRASE_BLOCKLIST=[]
+
 # Chance of response, a number from 0 to 1 (0 - will never respond, 1 - always responds)
 CHANCE_COMMENTS=1 # a chance to leave a comment under the post
 CHANCE_REPLY=0.7 # chance to reply if the user replied to the bot's message
